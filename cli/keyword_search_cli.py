@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import string
 
 
 def main() -> None:
@@ -16,13 +17,19 @@ def main() -> None:
     with open("data/movies.json") as file:
         data = json.load(file)
 
+    rmTbl = str.maketrans("", "", string.punctuation)
+
     match args.command:
         case "search":
             print(f"Searching for: {args.query}")
             i = 1
 
             for movie in data["movies"]:
-                if args.query in movie["title"]:
+
+                title = movie["title"].lower().translate(rmTbl)
+                query = args.query.lower().translate(rmTbl)
+
+                if query in title:
                     print(f"{i}. {movie["title"]}")
                     i += 1
                 
