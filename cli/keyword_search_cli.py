@@ -17,6 +17,9 @@ def main() -> None:
     with open("data/movies.json") as file:
         data = json.load(file)
 
+    with open("data/stopwords.txt") as file:
+        stopwords = file.read().splitlines()
+
     rmTbl = str.maketrans("", "", string.punctuation)
 
     match args.command:
@@ -25,11 +28,17 @@ def main() -> None:
             i = 1
 
             queryTks = [x for x in args.query.lower().translate(rmTbl).split(" ") if x != ""]
-            print(f"query tokens: {queryTks}")
+
+            for wd in stopwords:
+                if wd in queryTks:
+                    queryTks.remove(wd)
             
             for movie in data["movies"]:
 
                 titleTks = [x for x in movie["title"].lower().translate(rmTbl).split(" ") if x != ""]
+                for wd in stopwords:
+                    if wd in titleTks:
+                        titleTks.remove(wd)
 
                 for qt in queryTks:
                     for tT in titleTks:
