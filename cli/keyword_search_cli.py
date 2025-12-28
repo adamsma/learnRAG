@@ -24,14 +24,22 @@ def main() -> None:
             print(f"Searching for: {args.query}")
             i = 1
 
+            queryTks = [x for x in args.query.lower().translate(rmTbl).split(" ") if x != ""]
+            print(f"query tokens: {queryTks}")
+            
             for movie in data["movies"]:
 
-                title = movie["title"].lower().translate(rmTbl)
-                query = args.query.lower().translate(rmTbl)
+                titleTks = [x for x in movie["title"].lower().translate(rmTbl).split(" ") if x != ""]
 
-                if query in title:
-                    print(f"{i}. {movie["title"]}")
-                    i += 1
+                for qt in queryTks:
+                    for tT in titleTks:
+                        if qt in tT:
+                            print(f"{i}. {movie["title"]}")
+                            i += 1
+                            break
+
+                    if qt in tT:
+                            break
                 
                 if i > 5:
                     break
