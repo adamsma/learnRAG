@@ -3,7 +3,7 @@
 import argparse
 import json
 import string
-
+from nltk.stem import PorterStemmer
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Keyword Search CLI")
@@ -21,6 +21,7 @@ def main() -> None:
         stopwords = file.read().splitlines()
 
     rmTbl = str.maketrans("", "", string.punctuation)
+    stemmer = PorterStemmer()
 
     match args.command:
         case "search":
@@ -42,6 +43,9 @@ def main() -> None:
 
                 for qt in queryTks:
                     for tT in titleTks:
+                        qt = stemmer.stem(qt)
+                        tT = stemmer.stem(tT)
+                        
                         if qt in tT:
                             print(f"{i}. {movie["title"]}")
                             i += 1
