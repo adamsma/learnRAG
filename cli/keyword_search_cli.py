@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
 import argparse
-import json
-import string
-from nltk.stem import PorterStemmer
+
+
+from lib.keyword_search import search_command
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Keyword Search CLI")
@@ -14,48 +14,13 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    with open("data/movies.json") as file:
-        data = json.load(file)
-
-    with open("data/stopwords.txt") as file:
-        stopwords = file.read().splitlines()
-
-    rmTbl = str.maketrans("", "", string.punctuation)
-    stemmer = PorterStemmer()
-
     match args.command:
         case "search":
             print(f"Searching for: {args.query}")
             i = 1
-
-            queryTks = [x for x in args.query.lower().translate(rmTbl).split(" ") if x != ""]
-
-            for wd in stopwords:
-                if wd in queryTks:
-                    queryTks.remove(wd)
-            
-            for movie in data["movies"]:
-
-                titleTks = [x for x in movie["title"].lower().translate(rmTbl).split(" ") if x != ""]
-                for wd in stopwords:
-                    if wd in titleTks:
-                        titleTks.remove(wd)
-
-                for qt in queryTks:
-                    for tT in titleTks:
-                        qt = stemmer.stem(qt)
-                        tT = stemmer.stem(tT)
-                        
-                        if qt in tT:
-                            print(f"{i}. {movie["title"]}")
-                            i += 1
-                            break
-
-                    if qt in tT:
-                            break
-                
-                if i > 5:
-                    break
+            results = search_command(args.query)
+            for i, res in enumerate(results, 1):
+                print(f"{i}. {res['title']}")
 
         case _:
             parser.print_help()
